@@ -1,3 +1,6 @@
+// jQuery way of calling API - to learn, only works for search button
+// API - 100 requests per month
+
 // $("#form").submit(function (e) {
 //     e.preventDefault();
 
@@ -41,6 +44,7 @@
 //     });
 // });
 
+//Google API custom engine search settings  
 const endPnt = "https://www.googleapis.com/customsearch/v1?";
 const userKey = 'AIzaSyDvLratthKzg0ybEGCw9Z3cowIzGTu4g_Y';
 const engine = '84ec0c213f611877d';
@@ -49,64 +53,78 @@ const searchButton = document.getElementById('search_btn');
 const randomButton = document.getElementById('random');
 const queryText = document.getElementById('search');
 
-
+// set up listeneres for both buttons
 searchButton.addEventListener("click", submitSearch);
 randomButton.addEventListener("click", openRandom);
 
-
+// Search button pressed function
 function submitSearch(e) {
     e.preventDefault();
-
+    // search bar value
     const query = queryText.value;
     console.log(query);
-
+    // API with query = search bar value
     let  url = `${endPnt}key=${userKey}&cx=${engine}&q=${query}`;
     console.log(url);
-
+    // request - response
     fetch(url)
         .then(r => r.json())
+        // call function to work out the response
         .then((responseJson) => {appendLinks(responseJson)})
         .catch(console.warn)
 };
-
+// function works out response -  show the search results 
 function appendLinks(links){
     const linksList = document.querySelector("ul")
+    // control test 
     console.log("appendLink" + links.items[1].title);
     // clear previous results
     while (linksList.hasChildNodes()) {  
         linksList.removeChild(linksList.firstChild);
       }
-
+    // call function to work out every item in array (response)
     links.items.forEach(appendLink);
+    //scroll to tag 'ul' smoothly
     linksList.scrollIntoView({
         behavior: 'smooth'
       });
 };
 
+// function works out every item in array (response) - 
+// picks out title, url, snippets from item, creates new tags for them and 
+// append as a child tags to 'ul'  
 function appendLink(linkData){
+    // catch 'ul' element, all created elements will be appent to it 
     const linksList = document.querySelector('ul');
-    
-    // title
+
+    // 1. work out the title
+    // create the 'li' element
     const newLi = document.createElement('li');
+    // put the title from item into 'li' content
     newLi.textContent = `${linkData.title}`
-    // newLi.classList.add = ""
+    // append the 'li' element to 'ul'
     linksList.appendChild(newLi);
-    // snippet
+    
+    // 2. work out the snippet
+    // create the 'p' element
     const newP = document.createElement('p');
+    // put the snippet from item into 'p' content
     newP.textContent = linkData.snippet;
+    // append the anchor element to 'ul'.
     linksList.appendChild(newP);
 
-    // link
+    // 3. worl out the link
+    // create the 'a' element
     const a = document.createElement('a');
-    // Create the text node for anchor element.
+    // create the text node for 'a' element
     let link = document.createTextNode(`${linkData.link}`);
-    // Append the text node to anchor element.
+    // append the text node to 'a' element
     a.appendChild(link); 
-    // Set the title.
+    // put the title fron item to the title of 'a' (show when you hover over the link)
     a.title = linkData.title;  
-    // Set the href property.
+    // set the href property
     a.href = linkData.link; 
-    // Append the anchor element to the body.
+    // append the anchor element to 'ul'.
     linksList.appendChild(a); 
 };
 
