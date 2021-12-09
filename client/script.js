@@ -44,37 +44,51 @@
 //     });
 // });
 
+
+// ------- SET UP CONSTANTS -------------
 //Google API custom engine search settings  
+// 100 free requests per day
+// search engine at https://cse.google.com/cse/all: day13 (entire web search)
+// API key at https://console.cloud.google.com/projectselector2/google/maps-apis
+// Google seach API endpoint
 const endPnt = "https://www.googleapis.com/customsearch/v1?";
+// API user key 
 const userKey = 'AIzaSyDvLratthKzg0ybEGCw9Z3cowIzGTu4g_Y';
+// search engine ID
 const engine = '84ec0c213f611877d';
 
+// catch search bar
 const searchButton = document.getElementById('search_btn');
+// catch open random button
 const randomButton = document.getElementById('random');
+// catch search button
 const queryText = document.getElementById('search');
 
-// set up listeneres for both buttons
+// -------- START ---------------------
+// set up event listeneres for buttons
 searchButton.addEventListener("click", submitSearch);
 randomButton.addEventListener("click", openRandom);
 
+// -------- BUTTONS WORKFLOW-----------
 // Search button pressed function
 function submitSearch(e) {
     e.preventDefault();
-    // search bar value
+    // get search bar value
     const query = queryText.value;
     console.log(query);
-    // API with query = search bar value
+    // create url for API with query
     let  url = `${endPnt}key=${userKey}&cx=${engine}&q=${query}`;
     console.log(url);
-    // request - response
+    // get response - data from API
     fetch(url)
         .then(r => r.json())
-        // call function to work out the response
+        // call function to work out the response and to show search results
         .then((responseJson) => {appendLinks(responseJson)})
         .catch(console.warn)
 };
 // function works out response -  show the search results 
 function appendLinks(links){
+    // catch 'ul' element
     const linksList = document.querySelector("ul")
     // control test 
     console.log("appendLink" + links.items[1].title);
@@ -89,6 +103,7 @@ function appendLinks(links){
         behavior: 'smooth'
       });
 };
+
 
 // function works out every item in array (response) - 
 // picks out title, url, snippets from item, creates new tags for them and 
@@ -128,32 +143,37 @@ function appendLink(linkData){
     linksList.appendChild(a); 
 };
 
+// function works out response - open random link in the new tab  
 function openRandom(e) {
     e.preventDefault();
-
+    // get search bar value
     const query = queryText.value;
+    //check
     console.log("openRandom "+query);
-
-    let  url = `${endPnt}key=${userKey}&cx=${engine}&q=${query}`;
+    // create url for API with query
+    const  url = `${endPnt}key=${userKey}&cx=${engine}&q=${query}`;
+    // check API url
     console.log(url);
-
+    // get response - data from API 
     fetch(url)
         .then(r => r.json())
-        // .then((responseJson) => {console.log(responseJson)})
+        // call the function to work out the response and open the tab
         .then((responseJson) => {openRandomLink(responseJson)})
         .catch(console.warn)
 };
-
+// function picks up random item from response and opens the link in new tav
 function openRandomLink(links){
+    // get random number [0,10)
     randomNumber = Math.floor(Math.random()*10);
+    // check
     console.log(randomNumber);
     console.log("randomLink " + links.items[randomNumber].link);
+    // pick up random link from items data according to the random number
     randomLink = links.items[randomNumber].link;
+    // open link in the new tab
     window.open(randomLink, '_blank');
     // clear previous results
     const linksList = document.querySelector("ul")
-    console.log("appendLink" + links.items[1].title);
-    
     while (linksList.hasChildNodes()) {  
         linksList.removeChild(linksList.firstChild);
       }
